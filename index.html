@@ -50,6 +50,8 @@
       let pyodide = await pyodideReadyPromise;
       try {
         let output = pyodide.runPython(`
+import js
+
 def get_ascii(letter, start_letter, end_letter, distance):
   asciicode = ord(letter)+distance
   while (asciicode > ord(end_letter)):
@@ -67,7 +69,8 @@ def shift(letter, distance):
       return letter
 
 distance = ${distance.value}
-sentence = '${sentence.value}'
+#sentence = '${sentence.value.replace("'","\'")}'
+sentence = js.sentence.value
 encrypted_sentence = ""
 for letter in sentence:
   encrypted_sentence += shift(letter, distance)
