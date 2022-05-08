@@ -3,14 +3,15 @@
 
 <head>
   <title>Caesar Cipher</title>
-
-  <script src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>
+  <link rel="stylesheet" href="./css/pyscript.css" />
+  <link rel="stylesheet" href="./css/button.css" />
+  <script defer src="./js/pyscript.js"></script>
   <script>
     function updateSlider(slideAmount) {
       //get the element
       var sliderValue = document.getElementById("slidervalue");
       //show the amount
-      sliderValue.innerHTML = slideAmount;
+      sliderValue.innerText = slideAmount;
     }
   </script>
 </head>
@@ -21,68 +22,12 @@
   <p><b>Cipher Distance:</b> <label id="slidervalue">0</label></p>
   <input type="range" min="0" max="25" value="0" class="slider" id="distance" onchange="updateSlider(this.value)" />
 
-  <p><b>Sentence: </b><input id="sentence" value="Enter a sentence here." /></p>
-  <button onclick="evaluatePython()">Encrypt</button>
-  <br />
-  <br />
-  <div>Output:</div>
-  <textarea id="output" style="width: 100%;" rows="6" disabled></textarea>
-
-  <script>
-    const output = document.getElementById("output");
-    const sentence = document.getElementById("sentence");
-    const distance = document.getElementById("distance");
-
-    function printToOutput(result) {
-      output.value = result + "\n";
-    }
-
-    output.value = "Initializing...\n";
-    // init Pyodide
-    async function main() {
-      let pyodide = await loadPyodide();
-      output.value += "Ready to encrypt!\n";
-      return pyodide;
-    }
-    let pyodideReadyPromise = main();
-
-    async function evaluatePython() {
-      let pyodide = await pyodideReadyPromise;
-      try {
-        let output = pyodide.runPython(`
-import js
-
-def get_ascii(letter, start_letter, end_letter, distance):
-  asciicode = ord(letter)+distance
-  while (asciicode > ord(end_letter)):
-      asciicode -= 26
-  while (asciicode < ord(start_letter)):
-      asciicode += 26
-  return asciicode
-  
-def shift(letter, distance):
-  if(ord(letter) >= ord('a') and ord(letter) <= ord('z')):
-      return chr(get_ascii(letter, 'a', 'z', distance))
-  elif (ord(letter) >= ord('A') and ord(letter) <= ord('Z')):
-      return chr(get_ascii(letter, 'A', 'Z', distance))
-  else:
-      return letter
-
-distance = ${distance.value}
-#sentence = '${sentence.value.replace("'","\'")}'
-sentence = js.sentence.value
-encrypted_sentence = ""
-for letter in sentence:
-  encrypted_sentence += shift(letter, distance)
-
-encrypted_sentence
-          `);
-        printToOutput(output);
-      } catch (err) {
-        printToOutput(err);
-      }
-    }
-  </script>
+  <p><b>Sentence: </b><input id="sentence" value="Enter a sentence here!" /></p>
+  <input type="button" class="button" id="btnEncrypt" value="Encrypt!">
+  <br>
+  <br>
+  <div id="result">Loading libraries... please wait...</div>
+  <py-script src="./py/cipher.py"></py-script>
 </body>
 
 </html>
